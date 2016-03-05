@@ -14644,7 +14644,7 @@ darwin_local_data_pic (rtx disp)
    satisfies CONSTANT_P.  */
 
 static bool
-ix86_legitimate_constant_p (machine_mode, rtx x)
+ix86_legitimate_constant_p (machine_mode mode, rtx x)
 {
   /* Pointer bounds constants are not valid.  */
   if (POINTER_BOUNDS_MODE_P (GET_MODE (x)))
@@ -14711,7 +14711,14 @@ ix86_legitimate_constant_p (machine_mode, rtx x)
       break;
 
     case CONST_WIDE_INT:
-      if (!TARGET_64BIT && !standard_sse_constant_p (x))
+      if (!TARGET_64BIT
+	  && !standard_sse_constant_p (x)
+	  && GET_MODE_SIZE (TARGET_AVX512F
+			    ? XImode
+			    : (TARGET_AVX
+			       ? OImode
+			       : (TARGET_SSE2
+				  ? TImode : DImode))) < GET_MODE_SIZE (mode))
 	return false;
       break;
 
